@@ -83,6 +83,8 @@ async function handleCallback(ctx) {
   await ctx.answerCbQuery();               // убираем "часики" у кнопки
 }
 
+const sheetsService = require('../../services/sheets');
+
 async function nextStep(ctx, state, flow) {
   state.step++;
 
@@ -91,22 +93,21 @@ async function nextStep(ctx, state, flow) {
   }
 
   // все вопросы заданы → решаем, как сохранять
-  const sheetsService = require('../../services/sheets');
-
   if (flow.mode === 'appendToCell') {
     const a = state.answers;
     const line = `${a.time} — ${a.duration} (поводок: ${a.leashPull}/5, возб.: ${a.walkArousals}/5)`;
 
     const row = await sheetsService.findOrCreateTodayRow(flow.sheetName);
-    const cell = `B${row}`; // колонка прогулок
+    const cell = `B${row}`; // колонка walk
 
     await sheetsService.appendToCell(flow.sheetName, cell, line);
-
-    ctx.reply('walk saved');
-    } else {
-    // стандартное поведение (например, для day/cu)
+    ctx.reply('Прогулка записана 🐾');
+  } else if (flow.mode === 'updateTodayRow') {
+    await sheetsService.updateTodayRow(flow, state.answers);
+    ctx.reply('День записан ✅');
+  } else {
     await sheetsService.appendRow(flow, state.answers);
-    ctx.reply('done');
+    ctx.reply('Готово, всё записал 👍');
   }
 
   delete userState[ctx.from.id];

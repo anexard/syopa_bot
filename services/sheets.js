@@ -65,6 +65,7 @@ async function appendToCell(sheetName, cell, newValue) {
   return updatedValue;
 }
 
+// найти или создать строку с сегодняшней датой в колонке A
 async function findOrCreateTodayRow(sheetName) {
   const authClient = await auth.getClient();
   const sheets = google.sheets({ version: 'v4', auth: authClient });
@@ -78,9 +79,9 @@ async function findOrCreateTodayRow(sheetName) {
 
   const rows = res.data.values || [];
 
-  // ищем строку, где дата в A начинается с 'YYYY-MM-DD'
+  // пропускаем заголовок (i = 1)
   let rowIndex = -1;
-  for (let i = 1; i < rows.length; i++) { // i = 1, чтобы пропустить заголовок "Date"
+  for (let i = 1; i < rows.length; i++) {
     const cell = (rows[i][0] || '').toString();
     if (cell.slice(0, 10) === today) {
       rowIndex = i;
@@ -89,11 +90,10 @@ async function findOrCreateTodayRow(sheetName) {
   }
 
   if (rowIndex !== -1) {
-    // нашли существующую строку (i — 0-based -> +1 для номера строки)
-    return rowIndex + 1;
+    return rowIndex + 1; // номер строки (1-based)
   }
 
-  // строки на сегодня нет — создаём новую
+  // строки нет — создаём новую
   await sheets.spreadsheets.values.append({
     spreadsheetId: config.spreadsheetId,
     range: `${sheetName}!A:A`,
@@ -101,11 +101,55 @@ async function findOrCreateTodayRow(sheetName) {
     resource: { values: [[today]] },
   });
 
-  return rows.length + 1; // новая строка внизу
+  return rows.length + 1;
+}
+
+// помощник: номер колонки -> буква (0 = A, 1 = B, 2 = C...)
+function indexToColumnLetter(index) {
+  let n = index;
+  let s = '';
+  while (n >= 0) {
+    s = String.fromCharCode((n % 26) + 65) + s;
+    n = Math.floor(n / 26) - 1;
+  }
+  return s;
+}
+
+// буква -> индекс (A=0, B=1, C=2...)
+function columnLetterToIndex(letter) {
+  let n = 0;
+  for (let i = 0; i < letter.length; i++) {
+    n = n * 26 + (letter.charCodeAt(i) - 64);
+  }
+  return n - 1;
+}
+
+// обновить строку сегодняшнего дня значениями dayFlow
+async function updateTodayRow(flow, answers) {
+  const authClient = await auth.getClient();
+  const sheets = google.sheets({ version: 'v4', auth: authClient });
+
+  const rowNumber = await findOrCreateTodayRow(flow.sheetName);
+
+  const startIndex = columnLetterToIndex(flow.startColumn); // 'C' -> 2
+  const endIndex   = startIndex + flow.columns.length - 1;
+  const endColumn  = indexToColumnLetter(endIndex);         // например 'K'
+
+  const range = `${flow.sheetName}!${flow.startColumn}${rowNumber}:${endColumn}${rowNumber}`;
+
+  const row = flow.columns.map((columnName) => answers[columnName] ?? '');
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: config.spreadsheetId,
+    range,
+    valueInputOption: 'RAW',
+    resource: { values: [row] },
+  });
 }
 
 module.exports = {
   appendRow,
   appendToCell,
   findOrCreateTodayRow,
+  updateTodayRow,
 };
