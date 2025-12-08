@@ -10,14 +10,14 @@ const fields = [
       { label: '🟥 Красный', value: 'red' },
       { label: '🟧 Оранжевый', value: 'orange' },
       { label: '🟨 Желтый', value: 'yellow' },
-      { label: '🟩 Лаймовый', value: 'lime' }
+      { label: '🟩 Лаймовый', value: 'lime' },
       { label: '🟩 Зеленый', value: 'green' },
     ], },
   { key: 'evening',       question: 'Состояние вечером',        type: 'choice', options: [
       { label: '🟥 Красный', value: 'red' },
       { label: '🟧 Оранжевый', value: 'orange' },
       { label: '🟨 Желтый', value: 'yellow' },
-      { label: '🟩 Лаймовый', value: 'lime' }
+      { label: '🟩 Лаймовый', value: 'lime' },
       { label: '🟩 Зеленый', value: 'green' },
     ], },
   { key: 'feeding',       question: 'Время кормления' },
@@ -27,7 +27,7 @@ const fields = [
       { label: '🟥 Красный', value: 'red' },
       { label: '🟧 Оранжевый', value: 'orange' },
       { label: '🟨 Желтый', value: 'yellow' },
-      { label: '🟩 Лаймовый', value: 'lime' }
+      { label: '🟩 Лаймовый', value: 'lime' },
       { label: '🟩 Зеленый', value: 'green' },
     ], },
   { key: 'comment',       question: 'Комментарий' },
