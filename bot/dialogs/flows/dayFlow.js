@@ -4,6 +4,7 @@ const fields = [
       { label: '🟥 Красный', value: 'red' },
       { label: '🟧 Оранжевый', value: 'orange' },
       { label: '🟨 Желтый', value: 'yellow' },
+      { label: '🟩 Лаймовый', value: 'lime' },
       { label: '🟩 Зеленый', value: 'green' },
     ], },
   { key: 'homeArousals',  question: 'Возбуждение дома',         type: 'choice', options: [
