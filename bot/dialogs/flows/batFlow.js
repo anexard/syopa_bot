@@ -14,9 +14,10 @@ const fields = [
     type: 'choice',
     options: [
       { label: '🟥 Красный', value: 'red' },
+      { label: '🟧 Оранжевый', value: 'orange' },
       { label: '🟨 Желтый', value: 'yellow' },
+      { label: '🟩 Лаймовый', value: 'lime' }
       { label: '🟩 Зеленый', value: 'green' },
-    ]
   },
   { key: 'comment',       question: 'Комментарий' },
 ];
