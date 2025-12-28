@@ -3,8 +3,8 @@ const flows = {
   cu: require('./flows/cuFlow'),
   bat: require('./flows/batFlow'),
   relax: require('./flows/relaxFlow'),
-  day: require('./flows/dayFlow'),    // если есть
-  walk: require('./flows/walkFlow'),  // 👈 новый
+  day: require('./flows/dayFlow'),
+  walk: require('./flows/walkFlow'),
 };
 
 const userState = {};
@@ -48,6 +48,14 @@ async function handleMessage(ctx) {
   const state = userState[id];
   if (!state) return;
 
+  if (state.guide) {
+    if (!state.guide.warned) {
+      state.guide.warned = true;
+      return ctx.reply('Сейчас открыт каталог инструкций 📚\nЗакрой его или нажми “↩️ Вернуться в занятие”.');
+    }
+    return;
+  }
+
   const flow = flows[state.flow];
   const field = flow.fields[state.step];
 
@@ -62,6 +70,11 @@ async function handleMessage(ctx) {
 
 // обработка callback_query от inline-кнопок
 async function handleCallback(ctx) {
+  const data = ctx.callbackQuery?.data || '';
+
+  // обрабатываем ТОЛЬКО кнопки flow (choice:...)
+  if (!data.startsWith('choice:')) return;
+
   const id = ctx.from.id;
   const state = userState[id];
   if (!state) {
@@ -72,7 +85,6 @@ async function handleCallback(ctx) {
   const flow = flows[state.flow];
   const field = flow.fields[state.step];
 
-  const data = ctx.callbackQuery.data;      // "choice:red"
   const [type, value] = data.split(':');
 
   if (field.type === 'choice' && type === 'choice') {
@@ -118,9 +130,34 @@ function cancelFlow(ctx) {
   ctx.reply('canceled');
 }
 
+function captureReturnPoint(ctx) {
+  const s = userState[ctx.from.id];
+
+  if (!s || !s.flow) return null;
+  return { flow: s.flow, step: s.step };
+}
+
+function resumeFromReturnPoint(ctx, rp) {
+  if (!rp) return ctx.reply('Не к чему возвращаться.');
+
+  const flow = flows[rp.flow];
+  if (!flow) return ctx.reply('Flow не найден.');
+
+  userState[ctx.from.id] = userState[ctx.from.id] || {};
+  userState[ctx.from.id].flow = rp.flow;
+  userState[ctx.from.id].step = rp.step;
+  userState[ctx.from.id].answers = userState[ctx.from.id].answers || {};
+
+  return askNext(ctx, flow, rp.step);
+}
+
 module.exports = {
+  flows,
+  userState,
   startFlow,
   handleMessage,
   handleCallback,
   cancelFlow,
+  captureReturnPoint,
+  resumeFromReturnPoint,
 };

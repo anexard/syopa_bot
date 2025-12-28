@@ -1,4 +1,5 @@
 const dialogManager = require('./dialogs/dialogManager');
+const { registerGuide } = require('./guideRouter');
 
 module.exports = function(bot) {
     bot.command('day', (ctx) => dialogManager.startFlow(ctx, 'day'));
@@ -17,6 +18,13 @@ module.exports = function(bot) {
         /relax — запись Relax Protocol
         /cancel — отменить текущий диалог`
         );
+    });
+
+    // Instructions catalogue
+    registerGuide(bot, {
+        userState: dialogManager.userState,
+        captureReturnPoint: dialogManager.captureReturnPoint,
+        resumeFromReturnPoint: dialogManager.resumeFromReturnPoint,
     });
 
     bot.command('cancel', (ctx) => {
