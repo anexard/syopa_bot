@@ -20,6 +20,7 @@ module.exports = function(bot) {
         /cu     — запись тренировки Control Unleashed
         /bat    — запись тренировки BAT 2.0
         /relax  — запись Relax Protocol
+        /guide  — Инструкции
 
         > Напоминания
         /remind add   — добавить напоминание
