@@ -25,11 +25,12 @@ const fields = [
 
 module.exports = {
   name: 'bat',
-  sheetName: 'bat!A:Z',      // или 'CU!A1', главное — верный таб
+  sheetName: 'bat',
+  useDate: false,
 
   // порядок столбцов в таблице
   columns: [
-    'timestamp',   // добавим автоматически
+    'timestamp',
     'location',
     'trigger',
     'triggerDur',

@@ -35,7 +35,8 @@ const fields = [
 
 module.exports = {
   name: 'relax',
-  sheetName: 'relax!A:Z',      // или 'CU!A1', главное — верный таб
+  sheetName: 'relax',
+  useDate: false,
 
   // порядок столбцов в таблице
   columns: [

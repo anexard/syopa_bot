@@ -35,9 +35,11 @@ function registerGuide(bot, { userState, flows, captureReturnPoint, resumeFromRe
     return ctx.reply('Каталог инструкций обновлён 🔄');
   });
 
-  bot.on('callback_query', async (ctx) => {
+  bot.on('callback_query', async (ctx, next) => {
     const data = ctx.callbackQuery?.data;
-    if (!data || !data.startsWith('G:')) return;
+    
+    // если не гайд — пропускаем дальше, чтобы работали flow:* и choice:*
+    if (!data || !data.startsWith('G:')) return next();
 
     const uid = ctx.from.id;
     const canReturn = !!(userState[uid]?.guide?.returnPoint);
@@ -88,7 +90,21 @@ function registerGuide(bot, { userState, flows, captureReturnPoint, resumeFromRe
     }
 
     if (data === 'G:CLOSE') {
+      const uid = ctx.from.id;
       await ctx.answerCbQuery();
+
+      // ✅ реально закрываем режим гайда
+      if (userState[uid]) userState[uid].guide = null;
+
+      // ✅ если был активный flow — вернём вопрос
+      const hasFlow = !!userState[uid]?.flow;
+      if (hasFlow) {
+        // returnPoint уже может быть null, поэтому берём текущее состояние flow
+        const rp = { flow: userState[uid].flow, step: userState[uid].step };
+        return resumeFromReturnPoint(ctx, rp);
+      }
+
+      // иначе просто убираем сообщение каталога
       return ctx.editMessageText('Закрыто.');
     }
   });

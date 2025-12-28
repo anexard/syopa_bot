@@ -37,8 +37,9 @@ const fields = [
 module.exports = {
   name: 'day',
   sheetName: 'day',             // без диапазона, только имя листа
-  mode: 'updateTodayRow',       // 👈 специальный режим для дневной строки
+  mode: 'updateTodayRow',       // специальный режим для дневной строки
   startColumn: 'C',             // с какой колонки писать (A=Date, B=walk)
+  useDate: true,
 
   columns: [
     'walkArousals',

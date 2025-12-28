@@ -13,4 +13,5 @@ module.exports = {
   sheetName: 'day',                // вкладка
   cell: 'B2',                      // ячейка, куда пишем все прогулки за день
   fields,
+  useDate: true,
 };
