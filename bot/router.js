@@ -13,14 +13,29 @@ module.exports = function(bot) {
     bot.command('help', (ctx) => {
         ctx.reply(
         `Доступные команды:
-        /day — запись результатов дня
-        /walk — Прогулки
-        /cu — запись тренировки CU
-        /bat — запись BAT 2.0
-        /relax — запись Relax Protocol
-        /cancel — отменить текущий диалог`
+
+        > Логи и записи
+        /day    — запись итогов дня
+        /walk   — запись прогулки
+        /cu     — запись тренировки Control Unleashed
+        /bat    — запись тренировки BAT 2.0
+        /relax  — запись Relax Protocol
+
+        > Напоминания
+        /remind add   — добавить напоминание
+        /remind list  — показать все напоминания
+        /remind del   — удалить напоминание
+
+        > Помощь и управление
+        /help   — показать эту справку
+        /cancel — отменить текущий диалог
+
+        > Подсказки:
+        • Во время диалога отвечай на вопросы бота
+        • Если открыт гайд — сначала закрой его
+        • Данные сохраняются в Google Sheets`
         );
-    });
+        });
 
     bot.command('remind', async (ctx) => {
         const msg = (ctx.message?.text || '').trim();

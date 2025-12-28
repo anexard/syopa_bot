@@ -59,7 +59,7 @@ async function addReminder({ chatId, userId, flowName, time, text, timezone }) {
     lastSent: '',
   };
 
-  await sheetsService.appendRawRow(SHEET, toRow(reminder)); // добавим функцию ниже
+  await sheetsService.appendRawRow(SHEET, toRow(reminder));
   return reminder;
 }
 
