@@ -41,6 +41,7 @@ module.exports = {
   // порядок столбцов в таблице
   columns: [
     'timestamp',   // добавим автоматически
+    'step',
     'location',
     'duration',
     'arousalStart',
