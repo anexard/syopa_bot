@@ -1,17 +1,39 @@
 // bot/dialogs/flows/walkFlow.js
 
 const fields = [
-  { key: 'time',         question: 'Во сколько была прогулка?', type: 'text' },
-  { key: 'duration',     question: 'Сколько длилась прогулка?', type: 'text' },
-  { key: 'leashPull',    question: 'Нападения на поводок (0–5)?', type: 'text' },
-  { key: 'walkArousals', question: 'Возбуждение на прогулке (0–5)?', type: 'text' },
+  {
+    key: 'walk_slot',
+    question: 'Какая по счёту прогулка?',
+    type: 'choice',
+    options: [
+      { label: '1', value: '1' },
+      { label: '2', value: '2' },
+      { label: '3', value: '3' },
+    ],
+  },
+
+  { key: 'time',         question: 'В который час', type: 'text' },
+  { key: 'duration',     question: 'Длительность (мин, числом)', type: 'text' },
+  { 
+    key: 'leash', 
+    question: 'Нападения на поводок', 
+    type: 'choice',
+    options: [
+      { label: '🟥 Уничтожал поводок', value: 'red' },
+      { label: '🟧 Атаковал 1-3 раза и играл с ним', value: 'orange' },
+      { label: '🟨 Прикусил', value: 'yellow' },
+      { label: '🟩 Заинтересовался', value: 'lime' },
+      { label: '🟩 Не нападал', value: 'green' },
+    ]
+  },
+  { key: 'arousal', question: 'Возбуждение на прогулке', type: 'text' },
+  { key: 'notes', question: 'Коротко: что важного?', type: 'text' },
 ];
 
 module.exports = {
   name: 'walk',
-  mode: 'appendToCell',            // пометим, что это спец-флоу
-  sheetName: 'day',                // вкладка
-  cell: 'B2',                      // ячейка, куда пишем все прогулки за день
-  fields,
+  mode: 'updateWalkSlot',  // новый режим
+  sheetName: 'day',
   useDate: true,
+  fields,
 };

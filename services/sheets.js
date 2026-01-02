@@ -274,12 +274,57 @@ async function findOrInsertRowByDate(sheetName, dateISO) {
   return rowNumber;
 }
 
+async function getHeaderMap(sheetName) {
+  const header = await getSheetValues(`${sheetName}!1:1`);
+  const row = header[0] || [];
+  const map = {};
+  row.forEach((name, idx) => {
+    if (name) map[String(name).trim()] = idx; // имя колонки -> индекс (0-based)
+  });
+  return map;
+}
+
+// Обновить конкретные колонки (по именам) в строке нужной даты
+async function updateRowColumnsByDate(sheetName, dateISO, updates) {
+  const authClient = await auth.getClient();
+  const sheets = google.sheets({ version: 'v4', auth: authClient });
+
+  const rowNumber = await findOrInsertRowByDate(sheetName, dateISO); // у вас уже есть
+  const headerMap = await getHeaderMap(sheetName);
+
+  const data = [];
+  for (const [colName, rawValue] of Object.entries(updates)) {
+    const idx = headerMap[colName];
+    if (idx === undefined) continue; // колонка не найдена — просто пропускаем
+
+    const colLetter = indexToColumnLetter(idx);
+    const range = `${sheetName}!${colLetter}${rowNumber}`;
+    data.push({
+      range,
+      values: [[normalizeValue(rawValue)]],
+    });
+  }
+
+  if (!data.length) return false;
+
+  await sheets.spreadsheets.values.batchUpdate({
+    spreadsheetId: config.spreadsheetId,
+    resource: {
+      valueInputOption: 'RAW',
+      data,
+    },
+  });
+
+  return true;
+}
+
 
 module.exports = {
   appendRow,
   appendToCell,
   findOrCreateRowByDate,
   updateRowByDate,
+  updateRowColumnsByDate,
   getSheetValues,
   appendRawRow,
   updateReminderEnabledById,

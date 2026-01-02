@@ -302,19 +302,27 @@ async function nextStep(ctx, state, flow) {
   // -------- save --------
   const date = state.targetDate; // YYYY-MM-DD
 
-  if (flow.mode === 'appendToCell') {
+  if (flow.mode === 'updateWalkSlot') {
     const a = state.answers;
-    const line = `${a.time} — ${a.duration} (поводок: ${a.leashPull}/5, возб.: ${a.walkArousals}/5)`;
+    const slot = a.walk_slot; // "1" | "2" | "3"
 
-    const row = await sheetsService.findOrInsertRowByDate(flow.sheetName, date);
-    const cell = `B${row}`;
+    const updates = {
+      [`walk_${slot}_time`]: a.time,
+      [`walk_${slot}_duration`]: a.duration,
+      [`walk_${slot}_leash`]: a.leash,
+      [`walk_${slot}_arousal`]: a.arousal,
+      [`walk_${slot}_notes`]: a.notes,
+    };
 
-    await sheetsService.appendToCell(flow.sheetName, cell, line);
-    ctx.reply(`Прогулка записана 🐾 (${date})`);
-  } else if (flow.mode === 'updateTodayRow') {
+    await sheetsService.updateRowColumnsByDate(flow.sheetName, date, updates);
+    ctx.reply(`Прогулка #${slot} записана 🐾 (${date})`);
+
+  } 
+  else if (flow.mode === 'updateTodayRow') {
     await sheetsService.updateRowByDate(flow, state.answers, date);
     ctx.reply(`День записан ✅ (${date})`);
-  } else {
+  } 
+  else {
     await sheetsService.appendRow(flow, { ...state.answers, date });
     ctx.reply('Готово, всё записал 👍');
   }
