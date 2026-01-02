@@ -308,7 +308,6 @@ async function nextStep(ctx, state, flow) {
 
     const updates = {
       [`walk_${slot}_time`]: a.time,
-      [`walk_${slot}_duration`]: a.duration,
       [`walk_${slot}_leash`]: a.leash,
       [`walk_${slot}_arousal`]: a.arousal,
       [`walk_${slot}_notes`]: a.notes,

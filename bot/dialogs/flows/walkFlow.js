@@ -7,13 +7,11 @@ const fields = [
     type: 'choice',
     options: [
       { label: '1', value: '1' },
-      { label: '2', value: '2' },
       { label: '3', value: '3' },
     ],
   },
 
-  { key: 'time',         question: 'В который час', type: 'text' },
-  { key: 'duration',     question: 'Длительность (мин, числом)', type: 'text' },
+  { key: 'time',         question: 'В который час и длительность (tt:tt - m)', type: 'text' },
   { 
     key: 'leash', 
     question: 'Нападения на поводок', 

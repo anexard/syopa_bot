@@ -10,7 +10,7 @@ const fields = [
     options: [
       { label: 'Frequent', value: 'red' },
       { label: 'Medium', value: 'yellow' },
-      { label: 'Rare', value: 'Green' },
+      { label: 'Rare', value: 'green' },
       { label: 'not today', value: '-' },
     ]
   },
@@ -21,7 +21,7 @@ const fields = [
     options: [
       { label: 'High: собаки, люди, звуки', value: 'red' },
       { label: 'Medium: просто прошли, просто фон', value: 'yellow' },
-      { label: 'Low: очень спокойно', value: 'Green' },
+      { label: 'Low: очень спокойно', value: 'green' },
       { label: 'None', value: '-' },
     ]
   },
