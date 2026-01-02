@@ -9,6 +9,13 @@ const auth = new google.auth.GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
+function normalizeValue(value) {
+  if (Array.isArray(value)) {
+    return value.join(', ');
+  }
+  return value ?? '';
+}
+
 async function appendRow(flow, answers) {
   const authClient = await auth.getClient();
   const sheets = google.sheets({ version: 'v4', auth: authClient });
@@ -18,7 +25,6 @@ async function appendRow(flow, answers) {
     if (columnName === 'timestamp') {
       return new Date().toISOString().slice(0, 10);
     }
-    // если ответа нет — кладём пустую строку
     return answers[columnName] ?? '';
   });
 
@@ -134,7 +140,9 @@ async function updateRowByDate(flow, answers, dateISO) {
 
   const range = `${flow.sheetName}!${flow.startColumn}${rowNumber}:${endColumn}${rowNumber}`;
 
-  const row = flow.columns.map((columnName) => answers[columnName] ?? '');
+  const row = flow.columns.map((columnName) =>
+    normalizeValue(answers[columnName])
+  );
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: config.spreadsheetId,

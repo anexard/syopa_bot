@@ -1,11 +1,41 @@
 const fields = [
-  { key: 'stage',       question: 'Этап' },
+  { key: 'step',       question: 'Этап' },
   { key: 'location',       question: 'Локация' },
   { key: 'duration',       question: 'Длительность' },
-  { key: 'arousalStart',       question: 'Начало возбуждения (минута)' },
-  { key: 'arousalEnd',       question: 'Конец возбуждения (минута)' },
-  { key: 'difficultSteps',       question: 'Тяжелое упражнение' },
-  { key: 'recoveries',       question: 'Восстановления' },
+  { key: 'arousals',       question: 'Arousal-recoveries: start, end, duration (minutes)' },
+  { 
+    key: 'rewardDensity', 
+    question: 'Reward Density: насколько еда держит состояние?', 
+    type: 'choice',
+    options: [
+      { label: 'Frequent', value: 'red' },
+      { label: 'Medium', value: 'yellow' },
+      { label: 'Rare', value: 'Green' },
+      { label: 'not today', value: '-' },
+    ]
+  },
+  { 
+    key: 'environment_load', 
+    question: 'Нагрузка среды', 
+    type: 'choice',
+    options: [
+      { label: 'High: собаки, люди, звуки', value: 'red' },
+      { label: 'Medium: просто прошли, просто фон', value: 'yellow' },
+      { label: 'Low: очень спокойно', value: 'Green' },
+      { label: 'None', value: '-' },
+    ]
+  },
+  { 
+    key: 'orientation', 
+    question: 'Направление фокуса', 
+    type: 'choice',
+    options: [
+      { label: 'Environment: смотрел вокруг', value: 'Environment, green' },
+      { label: 'Handler: больше смотрел на меня', value: 'Handler, yellow' },
+      { label: 'Mixed', value: 'Mixed, lime' },
+      { label: 'None', value: '-' },
+    ]
+  },
   { 
     key: 'overallEase', 
     question: 'Уровень общего возбуждения', 
@@ -16,6 +46,18 @@ const fields = [
       { label: '🟨 Желтый', value: 'yellow' },
       { label: '🟩 Лаймовый', value: 'lime' },
       { label: '🟩 Зеленый', value: 'green' },
+    ]
+  },
+  { 
+    key: 'end_state', 
+    question: 'Состояние в конце', 
+    type: 'choice',
+    options: [
+      { label: '🟥 Break', value: 'red' },
+      { label: '🟧 Seeking (ожидает еду/меня)', value: 'orange' },
+      { label: '🟨 Mild arousal', value: 'yellow' },
+      { label: '🟩 Neutral (lime)', value: 'lime' },
+      { label: '🟩 Soft (green)', value: 'green' },
     ]
   },
   { 
@@ -30,6 +72,7 @@ const fields = [
       { label: '🟩 Зеленый', value: 'green' },
     ]
   },
+  { key: 'difficultSteps',       question: 'Тяжелое упражнение' },
   { key: 'comment',       question: 'Комментарий' },
 ];
 
@@ -44,13 +87,14 @@ module.exports = {
     'step',
     'location',
     'duration',
-    'arousalStart',
-    'arousalEnd',
-    'difficultSteps',
-    'recoveries',
+    'arousals',
+    'rewardDensity',
+    'environment_load',
+    'orientation',
     'overallEase',
-    'RecovTime',
+    'end_state',
     'result',
+    'difficultSteps',
     'comment'
   ],
 

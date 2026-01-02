@@ -24,6 +24,20 @@ const fields = [
       { label: '🟩 Лаймовый', value: 'lime' },
       { label: '🟩 Зеленый', value: 'green' },
     ], },
+  { key: 'behavior',        question: 'Поведение',            type: 'choice', options: [
+    { label: '🟨 Желтый', value: 'yellow' },
+    { label: '🟩 Зеленый', value: 'green' },
+  ], },
+  { 
+    key: 'everyday_practices',
+    question: 'Ежедневные практики',
+    type: 'multi_choice', 
+    options: [
+      { label: 'Long sit', value: 'long sit' },
+      { label: 'Targeting', value: 'targeting' },
+      { label: 'Alone sit', value: 'sit alone' },
+    ], 
+  },
   { key: 'comment',       question: 'Комментарий' },
 ];
 
@@ -41,7 +55,9 @@ module.exports = {
     'dayContext',
     'health',
     'result',
+    'everyday_practices',
     'comment',
+    'behavior',
   ],
 
   fields,

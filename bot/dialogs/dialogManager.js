@@ -91,6 +91,21 @@ function startFlow(ctx, flowName) {
 function askNext(ctx, flow, step) {
   const field = flow.fields[step];
 
+  // ✅ multi_choice
+  if (field.type === 'multi_choice' && field.options) {
+    const uid = ctx.from.id;
+    const state = userState[uid];
+
+    // гарантируем массив
+    const selected = Array.isArray(state.answers[field.key])
+      ? state.answers[field.key]
+      : (state.answers[field.key] = []);
+
+    return ctx.reply(field.question, {
+      reply_markup: buildMultiChoiceKeyboard(field, selected),
+    });
+  }
+
   if (field.type === 'choice' && field.options) {
     return ctx.reply(field.question, {
       reply_markup: {
@@ -161,7 +176,16 @@ async function handleMessage(ctx) {
 
 async function handleCallback(ctx) {
   const data = ctx.callbackQuery?.data || '';
-  console.log('CALLBACK:', ctx.callbackQuery.data);
+
+  const id = ctx.from.id;
+  const state = userState[id];
+  if (!state) {
+    await ctx.answerCbQuery();
+    return;
+  }
+
+  const flow = flows[state.flow];
+  const field = flow.fields[state.step];
 
   // 1) дата
   if (data.startsWith('date:')) {
@@ -204,21 +228,59 @@ async function handleCallback(ctx) {
     return;
   }
 
+  if (!flow || !field) {
+    await ctx.answerCbQuery();
+    return;
+  }
+
+  // 2) multi_choice: toggle
+  if (data.startsWith('mc:')) {
+    const [, key, idxStr] = data.split(':'); // mc:<fieldKey>:<index>
+    if (field.type !== 'multi_choice' || field.key !== key) {
+      await ctx.answerCbQuery();
+      return;
+    }
+
+    const idx = Number(idxStr);
+    const opt = field.options?.[idx];
+    if (!opt) {
+      await ctx.answerCbQuery();
+      return;
+    }
+
+    const value = opt.value;
+
+    const arr = Array.isArray(state.answers[key])
+      ? state.answers[key]
+      : (state.answers[key] = []);
+
+    const pos = arr.indexOf(value);
+    if (pos === -1) arr.push(value);
+    else arr.splice(pos, 1);
+
+    await ctx.editMessageReplyMarkup(buildMultiChoiceKeyboard(field, arr));
+    await ctx.answerCbQuery();
+    return;
+  }
+
+  // 3) multi_choice: done
+  if (data.startsWith('mc_done:')) {
+    const [, key] = data.split(':'); // mc_done:<fieldKey>
+    if (field.type !== 'multi_choice' || field.key !== key) {
+      await ctx.answerCbQuery();
+      return;
+    }
+
+    await ctx.answerCbQuery('Ок!');
+    await nextStep(ctx, state, flow);
+    return;
+  }
+
   // 2) choice-кнопки
   if (!data.startsWith('choice:')) {
     await ctx.answerCbQuery();
     return;
   }
-
-  const id = ctx.from.id;
-  const state = userState[id];
-  if (!state) {
-    await ctx.answerCbQuery();
-    return;
-  }
-
-  const flow = flows[state.flow];
-  const field = flow.fields[state.step];
 
   const [, value] = data.split(':');
 
@@ -284,6 +346,21 @@ function resumeFromReturnPoint(ctx, rp) {
   // дату не трогаем: если юзер возобновляет — оставим текущую в state.targetDate
 
   return askNext(ctx, flow, rp.step);
+}
+
+function buildMultiChoiceKeyboard(field, selected = []) {
+  const set = new Set(selected);
+
+  const inline_keyboard = field.options.map((opt, i) => {
+    const isOn = set.has(opt.value);
+    const text = `${isOn ? '✅' : '⬜'} ${opt.label}`;
+    // ✅ вместо value кладём индекс i
+    return [{ text, callback_data: `mc:${field.key}:${i}` }];
+  });
+
+  inline_keyboard.push([{ text: 'Готово', callback_data: `mc_done:${field.key}` }]);
+
+  return { inline_keyboard };
 }
 
 module.exports = {

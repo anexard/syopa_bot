@@ -27,8 +27,13 @@ bot.on('text', (ctx) => dialogManager.handleMessage(ctx));
 bot.on('callback_query', async (ctx, next) => {
   const data = ctx.callbackQuery?.data || '';
 
-  // ✅ dialogManager обслуживает choice + date
-  if (data.startsWith('choice:') || data.startsWith('date:')) {
+  // ✅ dialogManager обслуживает flow callbacks
+  if (
+    data.startsWith('choice:') ||
+    data.startsWith('date:') ||
+    data.startsWith('mc:') ||
+    data.startsWith('mc_done:')
+  ) {
     await dialogManager.handleCallback(ctx);
     return;
   }
